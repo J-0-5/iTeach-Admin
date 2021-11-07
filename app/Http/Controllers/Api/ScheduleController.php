@@ -34,7 +34,7 @@ class ScheduleController extends Controller
             }
             ///////////////////////////////////////////////////
 
-            //validate range
+            //validate that time range is correct
             $schedule = Schedule::where('day', $request->day)->where('start_hour', '<=', $request->start_hour)->where('final_hour', '>=', $request->start_hour)->exists();
             if ($schedule) {
                 return response()->json(['status' => false, 'message' => 'La hora inicial se encuentra dentro del rango de un horario existente', 'data' => null]);
@@ -42,6 +42,11 @@ class ScheduleController extends Controller
             $schedule = Schedule::where('day', $request->day)->where('start_hour', '<=', $request->final_hour)->where('final_hour', '>=', $request->final_hour)->exists();
             if ($schedule) {
                 return response()->json(['status' => false, 'message' => 'La hora final se encuentra dentro del rango de un horario existente', 'data' => null]);
+            }
+
+            $schedule = Schedule::where('day', $request->day)->whereBetween('start_hour', [$request->start_hour, $request->final_hour])->whereBetween('final_hour', [$request->start_hour, $request->final_hour])->exists();
+            if ($schedule) {
+                return response()->json(['status' => false, 'message' => 'Ya existe un horario dentro de este rango', 'data' => null]);
             }
             ///////////////////////////////////////////////////
 
