@@ -22,5 +22,7 @@ Route::post('login', 'Api\UserController@login');
 
 //logged in
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('schedule', 'Api\ScheduleController@index');
     Route::post('schedule/store', 'Api\ScheduleController@store');
+    Route::delete('schedule/{id}', 'Api\ScheduleController@delete');
 });

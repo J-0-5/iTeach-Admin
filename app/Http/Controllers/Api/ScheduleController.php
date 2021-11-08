@@ -9,14 +9,28 @@ use App\Schedule;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        try {
+            $schedule = Schedule::teacher($request->teacher_id)
+                ->get();
+
+            return response()->json(['status' => true, 'message' => 'Consulta exitosa', 'data' => $schedule]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage(), 'data' => null]);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
-            //validate that all data exists in the database
+            /*validate that all data exists in the database*/
             $rol = ParameterValue::where('name', 'Profesor')->first();
             $day = Parameter::where('name', 'day')->first();
             $campus = Parameter::where('name', 'campus')->first();
@@ -30,44 +44,101 @@ class ScheduleController extends Controller
             ]);
 
             if ($Validator->fails()) {
-                return response()->json(['status' => false, 'message' => $Validator->errors()->first(), 'data' => null]);
+                return response()
+                    ->json([
+                        'status' => false,
+                        'message' => $Validator->errors()->first(),
+                        'data' => null
+                    ]);
             }
-            ///////////////////////////////////////////////////
+            /*===============================================*/
 
-            //validate that time range is correct
-            $schedule = Schedule::where('day', $request->day)->where('start_hour', '<=', $request->start_hour)->where('final_hour', '>=', $request->start_hour)->exists();
+            /*subSecond to final_hour*/
+            Arr::set($request, 'final_hour', Carbon::createFromFormat('H:i', $request->final_hour)->subSecond()->format('H:i'));
+            /*===============================================*/
+
+            /*validate that time range is correct*/
+            $schedule = Schedule::where('day', $request->day)
+                ->where('start_hour', '<=', $request->start_hour)
+                ->where('final_hour', '>=', $request->start_hour)
+                ->exists();
+
             if ($schedule) {
-                return response()->json(['status' => false, 'message' => 'La hora inicial se encuentra dentro del rango de un horario existente', 'data' => null]);
-            }
-            $schedule = Schedule::where('day', $request->day)->where('start_hour', '<=', $request->final_hour)->where('final_hour', '>=', $request->final_hour)->exists();
-            if ($schedule) {
-                return response()->json(['status' => false, 'message' => 'La hora final se encuentra dentro del rango de un horario existente', 'data' => null]);
+                return response()
+                    ->json([
+                        'status' => false,
+                        'message' => 'La hora inicial se encuentra dentro del rango de un horario existente',
+                        'data' => null
+                    ]);
             }
 
-            $schedule = Schedule::where('day', $request->day)->whereBetween('start_hour', [$request->start_hour, $request->final_hour])->whereBetween('final_hour', [$request->start_hour, $request->final_hour])->exists();
-            if ($schedule) {
-                return response()->json(['status' => false, 'message' => 'Ya existe un horario dentro de este rango', 'data' => null]);
-            }
-            ///////////////////////////////////////////////////
+            $schedule = Schedule::where('day', $request->day)
+                ->where('start_hour', '<=', $request->final_hour)
+                ->where('final_hour', '>=', $request->final_hour)
+                ->exists();
 
-            //validate that the time is correct
+            if ($schedule) {
+                return response()
+
+                    ->json([
+                        'status' => false,
+                        'message' => 'La hora final se encuentra dentro del rango de un horario existente',
+                        'data' => null
+                    ]);
+            }
+
+            $schedule = Schedule::where('day', $request->day)
+                ->whereBetween('start_hour', [$request->start_hour, $request->final_hour])
+                ->whereBetween('final_hour', [$request->start_hour, $request->final_hour])
+                ->exists();
+            if ($schedule) {
+                return response()
+                    ->json([
+                        'status' => false,
+                        'message' => 'Ya existe un horario dentro de este rango',
+                        'data' => null
+                    ]);
+            }
+            /*===============================================*/
+
+            /*validate that the time is correct*/
             $start_hour = Carbon::createFromFormat('H:i', $request->start_hour);
             $final_hour = Carbon::createFromFormat('H:i', $request->final_hour);
 
             if ($start_hour->diffInMinutes($final_hour, false) < 0) {
-                return response()->json(['status' => false, 'message' => 'La hora final debe ser mayor que la hora inicial', 'data' => null]);
+                return response()
+                    ->json([
+                        'status' => false,
+                        'message' => 'La hora final debe ser mayor que la hora inicial',
+                        'data' => null
+                    ]);
             }
+            /*===============================================*/
 
-            if ($start_hour->diffInMinutes($final_hour, false) < 60) {
-                return  response()->json(['status' => false, 'message' => 'El rango mínimo debe ser de 1 hora', 'data' => null]);
-            }
-            ///////////////////////////////////////////////////
-
-            //create schedule
+            /*create schedule*/
             $schedule = Schedule::create($request->all());
-            return response()->json(['status' => true, 'message' => 'Horario creado correctamente', 'data' => $schedule]);
-            ///////////////////////////////////////////////////
+            return response()
+                ->json([
+                    'status' => true,
+                    'message' => 'Horario creado correctamente',
+                    'data' => $schedule
+                ]);
+            /*===============================================*/
+        } catch (\Exception $e) {
+            return response()
+                ->json([
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                    'data' => null
+                ]);
+        }
+    }
 
+    public function delete($id)
+    {
+        try {
+            Schedule::find($id)->delete();
+            return response()->json(['status' => true, 'message' => 'Eliminación exitosa', 'data' => null]);
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage(), 'data' => null]);
         }

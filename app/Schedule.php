@@ -15,4 +15,11 @@ class Schedule extends Model
         'final_hour',
         'campus',
     ];
+
+    public function scopeTeacher($query, $id)
+    {
+        if (trim($id) != null) {
+            $query->where('teacher_id', $id);
+        }
+    }
 }
