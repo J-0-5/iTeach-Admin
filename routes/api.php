@@ -15,14 +15,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+   return $request->user();
 });
 
 Route::post('login', 'Api\UserController@login');
 
 //logged in
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('schedule', 'Api\ScheduleController@index');
-    Route::post('schedule/store', 'Api\ScheduleController@store');
-    Route::delete('schedule/{id}', 'Api\ScheduleController@delete');
+   Route::get('schedule', 'Api\ScheduleController@index');
+   Route::post('schedule/store', 'Api\ScheduleController@store');
+   Route::delete('schedule/{id}', 'Api\ScheduleController@delete');
+
+   Route::get('users/show', 'Api\UserController@show');
+   Route::post('users/update', 'Api\UserController@update');
 });
