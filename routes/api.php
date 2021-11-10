@@ -35,4 +35,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
    Route::delete('subjects/{id}', 'Api\SubjectsController@delete');
 
    Route::get('teach/subjects', 'Api\TeachController@subject');
+   Route::post('teach/assign', 'Api\TeachController@assign');
 });
