@@ -33,8 +33,8 @@ class TeachController extends Controller
    {
       try {
          $validator = Validator::make($request->all(), [
-            'teacher_id' => 'required|string|exists:users,id',
-            'subjects_id' => 'required|string|exists:subjects,id',
+            'teacher_id' => 'required|exists:users,id',
+            'subjects_id' => 'required|exists:subjects,id',
          ]);
 
          if ($validator->fails()) {
@@ -51,5 +51,27 @@ class TeachController extends Controller
          return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
       }
 
+   }
+
+   public function deleteAssign(Request $request)
+   {
+      try {
+         $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required|exists:users,id',
+            'subjects_id' => 'required|exists:subjects,id',
+         ]);
+
+         if ($validator->fails()) {
+            return  response()->json(['status' => false, 'message' => $Validator->errors()->first(), 'data' => $Validator->errors()]);
+         }
+
+         $deletedRows = Teach::where('teacher_id', $request->teacher_id)
+         ->where('subjects_id', $request->subjects_id)
+         ->delete();
+
+         return response()->json(['status' => true, 'message' => "Asignación eliminada correctamente", 'data' => null], 200);
+      } catch (\Exception $e) {
+         return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+      }
    }
 }

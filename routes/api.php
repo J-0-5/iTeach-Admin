@@ -36,4 +36,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
    Route::get('teach/subjects', 'Api\TeachController@subject');
    Route::post('teach/assign', 'Api\TeachController@assign');
+   Route::post('teach/subjects/delete', 'Api\TeachController@deleteAssign');
 });
