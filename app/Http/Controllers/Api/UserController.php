@@ -35,8 +35,8 @@ class UserController extends Controller
    public function show(Request $request)
    {
       $userData = User::find($request->id);
-      if (!empty($userData)) {return response()->json(['status' => 1, 'message' => "Datos del usuario", 'data' => $userData], 200);
-      }else{return response()->json(['status' => 2, 'message' => "Usuario no disponible", 'data' => []], 200);}
+      if (!empty($userData)) {return response()->json(['status' => true, 'message' => "Datos del usuario", 'data' => $userData], 200);
+      }else{return response()->json(['status' => false, 'message' => "Usuario no disponible", 'data' => []], 200);}
    }
 
    public function update(Request $request)
@@ -54,7 +54,7 @@ class UserController extends Controller
 
          if ($validator->fails()) {
             $message = $validator->errors()->first();
-            return response()->json(['state' => 2, 'message' => $message, 'data' => []], 200);
+            return response()->json(['state' => false, 'message' => $message, 'data' => []], 200);
          }
 
          $photUrl = "null";
@@ -73,10 +73,10 @@ class UserController extends Controller
          if (!empty($request->password)) {$userData->password = Hash::make($request->password);}
          $userData->update();
 
-         return response()->json(['status' => 1, 'message' => "Usuario actualizado correctamente", 'data' => $userData], 200);
+         return response()->json(['status' => true, 'message' => "Usuario actualizado correctamente", 'data' => $userData], 200);
       } catch (\Exception $e) {
          return( $e);
-         return response()->json(['status' => 2, 'message' => "Hemos tenido problemas", 'data' => []], 200);
+         return response()->json(['status' => false, 'message' => "Hemos tenido problemas", 'data' => []], 200);
       }
    }
 }
