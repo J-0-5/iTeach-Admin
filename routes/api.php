@@ -31,5 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
    Route::get('subjects', 'Api\SubjectsController@index');
    Route::post('subjects/store', 'Api\SubjectsController@store');
+   Route::put('subjects/update', 'Api\SubjectsController@update');
    Route::delete('subjects/{id}', 'Api\SubjectsController@delete');
 });

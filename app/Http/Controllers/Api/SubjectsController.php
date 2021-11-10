@@ -35,6 +35,27 @@ class SubjectsController extends Controller
         }
     }
 
+    public function update(Request $request)
+    {
+        try {
+            $Validator = Validator::make($request->all(), [
+                'id' => 'required|exists:subjects,id',
+                'name' => 'required|string|unique:subjects,name',
+            ]);
+
+            if ($Validator->fails()) {
+                return  response()->json(['status' => false, 'message' => $Validator->errors()->first(), 'data' => $Validator->errors()]);
+            }
+
+            if (Subjects::find($request->id)->update(['name' => $request->name])) {
+                return response()->json(['status' => true, 'message' => 'Materia actualizada correctamente', 'data' => null]);
+            }
+        } catch (\Exception $e) {
+            return ($e);
+            return response()->json(['status' => false, 'message' => "Hemos tenido problemas", 'data' => []], 200);
+        }
+    }
+
     public function delete($id)
     {
         try {
