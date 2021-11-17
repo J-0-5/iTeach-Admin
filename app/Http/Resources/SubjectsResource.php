@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TeachGetSubjectsResource extends JsonResource
+class SubjectsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,9 +16,9 @@ class TeachGetSubjectsResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'teacher_id' => $this->teacher_id,
-            'subjects_id' => $this->subjects_id,
-            'name' => $this->getSubjects->name
+            'id' => $this->id,
+            'name' => $this->name,
+            'created_at' => Carbon::create($this->created_at)->diffForHumans()
         ];
     }
 }

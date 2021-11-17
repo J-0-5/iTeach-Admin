@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SubjectsResource;
 use App\Subjects;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,6 +13,7 @@ class SubjectsController extends Controller
     public function index()
     {
         $subjects = Subjects::get();
+        $subjects = SubjectsResource::collection($subjects);
         return response()->json(['status' => true, 'message' => 'Materias existentes', 'data' => $subjects]);
     }
 

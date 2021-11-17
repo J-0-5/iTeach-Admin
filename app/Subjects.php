@@ -12,5 +12,4 @@ class Subjects extends Model
         'name',
     ];
 
-    public $timestamps = false;
 }

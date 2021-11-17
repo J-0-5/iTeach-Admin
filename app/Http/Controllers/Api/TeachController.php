@@ -11,67 +11,67 @@ use App\User, App\Teach;
 
 class TeachController extends Controller
 {
-   public function subject(Request $requets)
-   {
-      try {
-         //$teach = User::where('id', $requets->id)->where('rol_id', 2)->first();
-         $teacher = Teach::with('getUsers', 'getSubjects')
-         ->teach($requets->teacher_id)
-         ->subject($requets->subjects_id)
-         ->get();
+    public function subject(Request $requets)
+    {
+        try {
+            //$teach = User::where('id', $requets->id)->where('rol_id', 2)->first();
+            $teacher = Teach::with('getUsers', 'getSubjects')
+                ->teach($requets->teacher_id)
+                ->subject($requets->subjects_id)
+                ->get();
 
-         if (!empty($requets->teacher_id)) {$data = TeachGetSubjectsResource::collection($teacher);
-         }else{$data = TeachGetTeachersResource::collection($teacher);}
+            !empty($requets->teacher_id)
+                ? $data = TeachGetSubjectsResource::collection($teacher)
+                : $data = TeachGetTeachersResource::collection($teacher);
 
-         return response()->json(['status' => true, 'message' => "Listado", 'data' => $data], 200);
-      } catch (\Exception $e) {
-         return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
-      }
-   }
+            return response()->json(['status' => true, 'message' => "Listado", 'data' => $data], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+        }
+    }
 
-   public function assign(Request $request)
-   {
-      try {
-         $validator = Validator::make($request->all(), [
-            'teacher_id' => 'required|exists:users,id',
-            'subjects_id' => 'required|exists:subjects,id',
-         ]);
+    public function assign(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'teacher_id' => 'required|exists:users,id',
+                'subjects_id' => 'required|exists:subjects,id',
+            ]);
 
-         if ($validator->fails()) {
-            return  response()->json(['status' => false, 'message' => $Validator->errors()->first(), 'data' => $Validator->errors()]);
-         }
+            if ($validator->fails()) {
+                return  response()->json(['status' => false, 'message' => $validator->errors()->first(), 'data' => $validator->errors()]);
+            }
 
-         Teach::updateOrCreate(
-            ['teacher_id' => $request->teacher_id, 'subjects_id' => $request->subjects_id],
-            []
-         );
+            Teach::updateOrCreate(
+                ['teacher_id' => $request->teacher_id, 'subjects_id' => $request->subjects_id],
+                []
+            );
 
-         return response()->json(['status' => true, 'message' => "Materia asignada correctamente", 'data' => null], 200);
-      } catch (\Exception $e) {
-         return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
-      }
+            return response()->json(['status' => true, 'message' => "Materia asignada correctamente", 'data' => null], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+        }
+    }
 
-   }
+    public function deleteAssign(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'teacher_id' => 'required|exists:users,id',
+                'subjects_id' => 'required|exists:subjects,id',
+            ]);
 
-   public function deleteAssign(Request $request)
-   {
-      try {
-         $validator = Validator::make($request->all(), [
-            'teacher_id' => 'required|exists:users,id',
-            'subjects_id' => 'required|exists:subjects,id',
-         ]);
+            if ($validator->fails()) {
+                return  response()->json(['status' => false, 'message' => $validator->errors()->first(), 'data' => $validator->errors()]);
+            }
 
-         if ($validator->fails()) {
-            return  response()->json(['status' => false, 'message' => $Validator->errors()->first(), 'data' => $Validator->errors()]);
-         }
+            $deletedRows = Teach::where('teacher_id', $request->teacher_id)
+                ->where('subjects_id', $request->subjects_id)
+                ->delete();
 
-         $deletedRows = Teach::where('teacher_id', $request->teacher_id)
-         ->where('subjects_id', $request->subjects_id)
-         ->delete();
-
-         return response()->json(['status' => true, 'message' => "Asignación eliminada correctamente", 'data' => null], 200);
-      } catch (\Exception $e) {
-         return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
-      }
-   }
+            return response()->json(['status' => true, 'message' => "Asignación eliminada correctamente", 'data' => null], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+        }
+    }
 }
