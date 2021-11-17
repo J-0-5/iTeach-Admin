@@ -34,7 +34,7 @@ class UserController extends Controller
 
     public function show(Request $request)
     {
-        if(is_null($request->id)){
+        if (is_null($request->id) || $request->id == 0) {
             $request['id'] = Auth::user()->id;
         }
 
