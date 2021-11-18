@@ -38,7 +38,10 @@ class UserController extends Controller
             $request['id'] = Auth::user()->id;
         }
 
-        $userData = User::find($request->id);
+        $userData = User::where('id', $request->id)
+            ->with('role')
+            ->first();
+
         if (!empty($userData)) {
             return response()->json(['status' => true, 'message' => "Datos del usuario", 'data' => $userData], 200);
         } else {

@@ -34,4 +34,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password'
     ];
+
+    public function role()
+    {
+        return $this->belongsTo(ParameterValue::class, 'rol_id')->select(['id','name']);
+    }
 }

@@ -7,12 +7,24 @@ use App\Http\Resources\SubjectsResource;
 use App\Subjects;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class SubjectsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $subjects = Subjects::get();
+        if ($request->unassigned == 1) {
+            if ($request->teacher_id == 0) {
+                $request['teacher_id'] = Auth::user()->id;
+            }
+            $teacher_id = $request->teacher_id;
+            $subjects = Subjects::whereDoesntHave('teach', function (Builder $query) use ($teacher_id) {
+                $query->where('teacher_id', $teacher_id);
+            })->get();
+        }
+
         $subjects = SubjectsResource::collection($subjects);
         return response()->json(['status' => true, 'message' => 'Materias existentes', 'data' => $subjects]);
     }

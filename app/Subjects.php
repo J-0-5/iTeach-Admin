@@ -12,4 +12,8 @@ class Subjects extends Model
         'name',
     ];
 
+    public function teach()
+    {
+        return $this->hasMany(Teach::class, 'subjects_id', 'id');
+    }
 }

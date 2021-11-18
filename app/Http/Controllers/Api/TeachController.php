@@ -6,21 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\TeachGetSubjectsResource;
 use App\Http\Resources\TeachGetTeachersResource;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\User, App\Teach;
 
 class TeachController extends Controller
 {
-    public function subject(Request $requets)
+    public function subject(Request $request)
     {
         try {
-            //$teach = User::where('id', $requets->id)->where('rol_id', 2)->first();
+            if ($request->teacher_id == 0) {
+                $request['teacher_id'] = Auth::user()->id;
+            }
+
             $teacher = Teach::with('getUsers', 'getSubjects')
-                ->teach($requets->teacher_id)
-                ->subject($requets->subjects_id)
+                ->teach($request->teacher_id)
+                ->subject($request->subjects_id)
                 ->get();
 
-            !empty($requets->teacher_id)
+            !empty($request->teacher_id)
                 ? $data = TeachGetSubjectsResource::collection($teacher)
                 : $data = TeachGetTeachersResource::collection($teacher);
 
@@ -33,6 +37,8 @@ class TeachController extends Controller
     public function assign(Request $request)
     {
         try {
+
+
             $validator = Validator::make($request->all(), [
                 'teacher_id' => 'required|exists:users,id',
                 'subjects_id' => 'required|exists:subjects,id',
@@ -56,6 +62,10 @@ class TeachController extends Controller
     public function deleteAssign(Request $request)
     {
         try {
+            if (is_null($request->teacher_id) || $request->teacher_id == 0) {
+                $request['teacher_id'] = Auth::user()->id;
+            }
+
             $validator = Validator::make($request->all(), [
                 'teacher_id' => 'required|exists:users,id',
                 'subjects_id' => 'required|exists:subjects,id',
