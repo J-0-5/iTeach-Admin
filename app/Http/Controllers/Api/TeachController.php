@@ -37,7 +37,9 @@ class TeachController extends Controller
     public function assign(Request $request)
     {
         try {
-
+            if ($request->teacher_id == 0) {
+                $request['teacher_id'] = Auth::user()->id;
+            }
 
             $validator = Validator::make($request->all(), [
                 'teacher_id' => 'required|exists:users,id',
