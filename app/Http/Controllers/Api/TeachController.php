@@ -64,7 +64,7 @@ class TeachController extends Controller
     public function deleteAssign(Request $request)
     {
         try {
-            if (is_null($request->teacher_id) || $request->teacher_id == 0) {
+            if ($request->teacher_id == 0) {
                 $request['teacher_id'] = Auth::user()->id;
             }
 

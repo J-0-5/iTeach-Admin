@@ -20,8 +20,8 @@ class CreateUsersTable extends Migration
             $table->string('first_last_name');
             $table->string('second_last_name')->nullable();
             $table->string('photo_url')->nullable();
-            $table->bigInteger('rol_id')->unsigned();
-            $table->foreign('rol_id')->references('id')->on('parameter_value')->cascadeOnDelete();
+            $table->bigInteger('role_id')->unsigned();
+            $table->foreign('role_id')->references('id')->on('parameter_value')->cascadeOnDelete();
             $table->string('email')->unique();
             $table->string('password');
             $table->timestamps();

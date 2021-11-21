@@ -15,28 +15,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-   return $request->user();
+    return $request->user();
 });
 
 Route::post('login', 'Api\UserController@login');
 
 //logged in
 Route::middleware(['auth:sanctum'])->group(function () {
-   Route::get('schedule', 'Api\ScheduleController@index');
-   Route::post('schedule/store', 'Api\ScheduleController@store');
-   Route::delete('schedule/{id}', 'Api\ScheduleController@delete');
+    Route::get('parameter/values', 'Api\ParameterValueController@index');
 
-   Route::get('users/show', 'Api\UserController@show');
-   Route::post('users/update', 'Api\UserController@update');
+    Route::get('schedule', 'Api\ScheduleController@index');
+    Route::post('schedule/store', 'Api\ScheduleController@store');
+    Route::delete('schedule/{id}', 'Api\ScheduleController@delete');
 
-   Route::get('subjects', 'Api\SubjectsController@index');
-   Route::post('subjects/store', 'Api\SubjectsController@store');
-   Route::put('subjects/update', 'Api\SubjectsController@update');
-   Route::delete('subjects/{id}', 'Api\SubjectsController@delete');
+    Route::get('users/show', 'Api\UserController@show');
+    Route::post('users/update', 'Api\UserController@update');
 
-   Route::get('teach/subjects', 'Api\TeachController@subject');
-   Route::post('teach/assign', 'Api\TeachController@assign');
-   Route::post('teach/subjects/delete', 'Api\TeachController@deleteAssign');
+    Route::get('subjects', 'Api\SubjectsController@index');
+    Route::post('subjects/store', 'Api\SubjectsController@store');
+    Route::put('subjects/update', 'Api\SubjectsController@update');
+    Route::delete('subjects/{id}', 'Api\SubjectsController@delete');
 
-   Route::post('tutorship/create', 'Api\UserController@addTutorship');
+    Route::get('teach/subjects', 'Api\TeachController@subject');
+    Route::post('teach/assign', 'Api\TeachController@assign');
+    Route::post('teach/subjects/delete', 'Api\TeachController@deleteAssign');
+
+    Route::post('tutorship/store', 'Api\TutorshipController@store');
 });

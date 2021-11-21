@@ -1,11 +1,11 @@
 <?php
 return [
     'parameter' => [
-        "rol",
+        "role",
         "campus",
         "day",
     ],
-    'rol' => [
+    'role' => [
         "Admin",
         "Profesor",
         "Estudiante",

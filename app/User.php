@@ -22,7 +22,7 @@ class User extends Authenticatable
         'first_last_name',
         'second_last_name',
         'photo_url',
-        'rol_id',
+        'role_id',
         'email',
     ];
 
@@ -37,6 +37,6 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->belongsTo(ParameterValue::class, 'rol_id')->select(['id','name']);
+        return $this->belongsTo(ParameterValue::class, 'role_id')->select(['id','name']);
     }
 }

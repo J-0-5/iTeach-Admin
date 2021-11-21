@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
@@ -29,14 +30,17 @@ class ScheduleController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->teacher_id == 0) {
+            $request['teacher_id'] = Auth::user()->id;
+        }
         try {
             /*validate that all data exists in the database*/
-            $rol = ParameterValue::where('name', 'Profesor')->first();
+            $role = ParameterValue::where('name', 'Profesor')->first();
             $day = Parameter::where('name', 'day')->first();
             $campus = Parameter::where('name', 'campus')->first();
 
             $Validator = Validator::make($request->all(), [
-                'teacher_id' => ['required', Rule::exists('users', 'id')->where('rol_id', $rol->id)],
+                'teacher_id' => ['required', Rule::exists('users', 'id')->where('role_id', $role->id)],
                 'day' => ['required', Rule::exists('parameter_value', 'id')->where('parameter_id', $day->id)],
                 'start_hour' => 'required|date_format:H:i',
                 'final_hour' => 'required|date_format:H:i',
