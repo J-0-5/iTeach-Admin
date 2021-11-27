@@ -12,6 +12,22 @@ use App\User, App\Teach;
 
 class TeachController extends Controller
 {
+    public function teach(Request $request)
+    {
+        try {
+
+            $teacher = Teach::with('getUsers')
+                ->subject($request->subjects_id)
+                ->get();
+
+            $data = TeachGetTeachersResource::collection($teacher);
+
+            return response()->json(['status' => true, 'message' => "Listado", 'data' => $data], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+        }
+    }
+
     public function subject(Request $request)
     {
         try {
@@ -19,14 +35,11 @@ class TeachController extends Controller
                 $request['teacher_id'] = Auth::user()->id;
             }
 
-            $teacher = Teach::with('getUsers', 'getSubjects')
+            $teacher = Teach::with('getSubjects')
                 ->teach($request->teacher_id)
-                ->subject($request->subjects_id)
                 ->get();
 
-            !empty($request->teacher_id)
-                ? $data = TeachGetSubjectsResource::collection($teacher)
-                : $data = TeachGetTeachersResource::collection($teacher);
+            $data = TeachGetSubjectsResource::collection($teacher);
 
             return response()->json(['status' => true, 'message' => "Listado", 'data' => $data], 200);
         } catch (\Exception $e) {

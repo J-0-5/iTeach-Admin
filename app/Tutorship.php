@@ -13,6 +13,7 @@ class Tutorship extends Model
       'student_id',
       'subjects_id',
       'schedule_id',
+      'date',
       'observation'
    ];
 }

@@ -16,10 +16,27 @@ class Schedule extends Model
         'campus',
     ];
 
+    public function day()
+    {
+        return $this->hasOne(ParameterValue::class, 'id', 'day')->select(['id', 'name']);
+    }
+
+    public function campus()
+    {
+        return $this->hasOne(ParameterValue::class, 'id', 'campus')->select(['id', 'name']);
+    }
+
     public function scopeTeacher($query, $id)
     {
         if (trim($id) != null) {
             $query->where('teacher_id', $id);
+        }
+    }
+
+    public function scopeDay($query, $id)
+    {
+        if (trim($id) != null) {
+            $query->where('day', $id);
         }
     }
 }

@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\User, App\Teach, App\Schedule, App\Tutorship;
+use Carbon\Carbon;
 
 class TutorshipController extends Controller
 {
     public function store(Request $request)
     {
         try {
+            $request['date'] = Carbon::createFromFormat('Y-m-d', $request->date)->format('Y-m-d');
+            // return response()->json(['status' => false, 'message' => "Estudiante no disponible", 'data' => $request->date]);
             if ($request->student_id == 0) {
                 $request['student_id'] = Auth::user()->id;
             }
@@ -22,6 +25,7 @@ class TutorshipController extends Controller
                 'student_id' => 'required|exists:users,id',
                 'subjects_id' => 'required|exists:subjects,id',
                 'schedule_id' => 'required|exists:schedule,id',
+                'date' => 'required|date|date_format:Y-m-d|after:today',
                 'observation' => 'nullable'
             ]);
 
@@ -53,8 +57,7 @@ class TutorshipController extends Controller
                 return response()->json(['status' => false, 'message' => "El profesor no tiene la materia asignada", 'data' => null]);
             }
         } catch (\Exception $e) {
-            dd($e);
-            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+            return response()->json(['status' => false, 'message' => $e->getMessage(), 'data' => null], 200);
         }
     }
 }

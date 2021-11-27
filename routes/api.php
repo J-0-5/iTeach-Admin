@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('subjects/update', 'Api\SubjectsController@update');
     Route::delete('subjects/{id}', 'Api\SubjectsController@delete');
 
+    Route::get('teach', 'Api\TeachController@teach');
     Route::get('teach/subjects', 'Api\TeachController@subject');
     Route::post('teach/assign', 'Api\TeachController@assign');
     Route::post('teach/subjects/delete', 'Api\TeachController@deleteAssign');

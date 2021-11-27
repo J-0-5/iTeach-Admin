@@ -18,8 +18,13 @@ class ScheduleController extends Controller
 
     public function index(Request $request)
     {
+        if ($request->teacher_id == 0) {
+            $request['teacher_id'] = Auth::user()->id;
+        }
         try {
             $schedule = Schedule::teacher($request->teacher_id)
+                ->day($request->day)
+                ->with('day', 'campus')
                 ->get();
 
             return response()->json(['status' => true, 'message' => 'Consulta exitosa', 'data' => $schedule]);
