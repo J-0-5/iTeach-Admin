@@ -24,7 +24,7 @@ class CreateTutorshipTable extends Migration
             $table->bigInteger('schedule_id')->unsigned();
             $table->foreign('schedule_id')->references('id')->on('schedule')->cascadeOnDelete();
             $table->date('date');
-            $table->text('observation');
+            $table->text('observation')->nullable();
             $table->timestamps();
         });
     }

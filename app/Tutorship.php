@@ -16,4 +16,31 @@ class Tutorship extends Model
       'date',
       'observation'
    ];
+
+   public function getTeacher()
+   {
+      return $this->belongsTo(User::class, 'teacher_id');
+   }
+
+   public function getStudent()
+   {
+      return $this->belongsTo(User::class, 'student_id');
+   }
+
+   public function getSubjects()
+   {
+      return $this->belongsTo(Subjects::class, 'subjects_id');
+   }
+
+   public function getSchedule()
+   {
+      return $this->belongsTo(Schedule::class, 'schedule_id');
+   }
+
+   public function scopeState($query, $value)
+   {
+      if (!empty($value)) {
+         $query->whereIn('state', $value);
+      }
+   }
 }

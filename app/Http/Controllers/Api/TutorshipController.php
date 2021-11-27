@@ -6,16 +6,37 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\TutorshipShowResource;
 use App\User, App\Teach, App\Schedule, App\Tutorship;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 
 class TutorshipController extends Controller
 {
+    public function index(Request $request)
+    {
+        $id = Auth::user()->id;
+        $state = isset($request->state) ? $request->state : [];
+
+        $tutorship = Tutorship::where('teacher_id', $id)
+            ->state($state)
+            ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
+            ->get();
+
+        $data = TutorshipShowResource::collection($tutorship);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'listado de tutorias',
+            'data' => $data
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {
             $request['date'] = Carbon::createFromFormat('Y-m-d', $request->date)->format('Y-m-d');
-            // return response()->json(['status' => false, 'message' => "Estudiante no disponible", 'data' => $request->date]);
+
             if ($request->student_id == 0) {
                 $request['student_id'] = Auth::user()->id;
             }
@@ -24,10 +45,12 @@ class TutorshipController extends Controller
                 'teacher_id' => 'required|exists:users,id',
                 'student_id' => 'required|exists:users,id',
                 'subjects_id' => 'required|exists:subjects,id',
-                'schedule_id' => 'required|exists:schedule,id',
+                'schedule_id' => ['required', 'exists:schedule,id', Rule::unique('tutorship')->where(function ($query) use ($request) {
+                    return $query->where('date', $request->date);
+                })],
                 'date' => 'required|date|date_format:Y-m-d|after:today',
                 'observation' => 'nullable'
-            ]);
+            ], ['schedule_id.unique' => 'Ya hay una tutoría reservada para esta fecha y horario']);
 
             if ($validator->fails()) {
                 return  response()->json(['status' => false, 'message' => $validator->errors()->first(), 'data' => $validator->errors()]);
@@ -57,7 +80,41 @@ class TutorshipController extends Controller
                 return response()->json(['status' => false, 'message' => "El profesor no tiene la materia asignada", 'data' => null]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'message' => $e->getMessage(), 'data' => null], 200);
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        try {
+            $id = Auth::user()->id;
+
+            $validator = Validator::make($request->all(), [
+                'tutorship_id' => 'required|exists:tutorship,id'
+            ]);
+
+            if ($validator->fails()) {
+                return  response()->json(['status' => false, 'message' => $validator->errors()->first(), 'data' => $validator->errors()]);
+            }
+
+            $tutors = Tutorship::where('id', $request->tutorship_id)
+                ->where('teacher_id', $id)
+                ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
+                ->first();
+            if (!empty($tutors)) {
+
+                $data = new TutorshipShowResource($tutors);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Detalle de la tutoria',
+                    'data' => $data
+                ]);
+            } else {
+                return response()->json(['status' => false, 'message' => "Tutoria no disponible", 'data' => null]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => "", 'data' => null], 200);
         }
     }
 }
