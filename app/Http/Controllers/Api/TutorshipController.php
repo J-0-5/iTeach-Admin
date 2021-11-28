@@ -15,10 +15,12 @@ class TutorshipController extends Controller
 {
     public function index(Request $request)
     {
+
         $id = Auth::user()->id;
         $state = isset($request->state) ? $request->state : [];
 
         $tutorship = Tutorship::where('teacher_id', $id)
+            ->orWhere('student_id', $id)
             ->state($state)
             ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
             ->get();

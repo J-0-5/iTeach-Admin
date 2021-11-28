@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('teach/subjects/delete', 'Api\TeachController@deleteAssign');
 
     Route::get('tutorship', 'Api\TutorshipController@index');
-    Route::post('tutorship/store', 'Api\TutorshipController@store');
     Route::get('tutorship/show', 'Api\TutorshipController@show');
+    Route::post('tutorship/store', 'Api\TutorshipController@store');
+
 });
