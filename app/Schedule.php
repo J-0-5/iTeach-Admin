@@ -16,12 +16,12 @@ class Schedule extends Model
         'campus',
     ];
 
-    public function day()
+    public function getDay()
     {
         return $this->hasOne(ParameterValue::class, 'id', 'day')->select(['id', 'name']);
     }
 
-    public function campus()
+    public function getCampus()
     {
         return $this->hasOne(ParameterValue::class, 'id', 'campus')->select(['id', 'name']);
     }

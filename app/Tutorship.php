@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Date;
 
 class Tutorship extends Model
 {
@@ -40,7 +41,13 @@ class Tutorship extends Model
     public function scopeState($query, $value)
     {
         if (!empty($value)) {
-            $query->whereIn('state', $value);
+            $now = new Date();
+            if (in_array(13, $value)) {
+                $query->whereDate('date', '>=', date('Y-m-d'));
+            }
+            if (in_array(14, $value)) {
+                $query->whereDate('date', '<', date('Y-m-d'));
+            }
         }
     }
 }

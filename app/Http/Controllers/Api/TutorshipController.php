@@ -15,7 +15,6 @@ class TutorshipController extends Controller
 {
     public function index(Request $request)
     {
-
         $id = Auth::user()->id;
         $state = isset($request->state) ? $request->state : [];
 
@@ -23,6 +22,7 @@ class TutorshipController extends Controller
             ->orWhere('student_id', $id)
             ->state($state)
             ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
+            ->orderBy('date','ASC')
             ->get();
 
         $data = TutorshipShowResource::collection($tutorship);
@@ -101,6 +101,7 @@ class TutorshipController extends Controller
 
             $tutors = Tutorship::where('id', $request->tutorship_id)
                 ->where('teacher_id', $id)
+                ->orWhere('student_id', $id)
                 ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
                 ->first();
             if (!empty($tutors)) {
