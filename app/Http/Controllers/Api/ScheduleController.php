@@ -24,7 +24,7 @@ class ScheduleController extends Controller
         try {
             $schedule = Schedule::teacher($request->teacher_id)
                 ->day($request->day)
-                ->with('day', 'campus')
+                ->with('getDay', 'getCampus')
                 ->get();
 
             return response()->json(['status' => true, 'message' => 'Consulta exitosa', 'data' => $schedule]);
