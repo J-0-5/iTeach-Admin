@@ -22,7 +22,7 @@ class TutorshipController extends Controller
             ->orWhere('student_id', $id)
             ->state($state)
             ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
-            ->orderBy('date','ASC')
+            ->orderBy('date', 'ASC')
             ->get();
 
         $data = TutorshipShowResource::collection($tutorship);
@@ -89,7 +89,6 @@ class TutorshipController extends Controller
     public function show(Request $request)
     {
         try {
-            $id = Auth::user()->id;
 
             $validator = Validator::make($request->all(), [
                 'tutorship_id' => 'required|exists:tutorship,id'
@@ -100,10 +99,18 @@ class TutorshipController extends Controller
             }
 
             $tutors = Tutorship::where('id', $request->tutorship_id)
-                ->where('teacher_id', $id)
-                ->orWhere('student_id', $id)
-                ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule')
-                ->first();
+                ->with('getTeacher', 'getStudent', 'getSubjects', 'getSchedule');
+
+            $id = Auth::user()->id;
+
+            if (Auth::user()->role_id == 2) {
+                $tutors = $tutors->where('teacher_id', $id)->first();
+            }
+
+            if (Auth::user()->role_id == 3) {
+                $tutors = $tutors->where('student_id', $id)->first();
+            }
+
             if (!empty($tutors)) {
 
                 $data = new TutorshipShowResource($tutors);
